@@ -40,14 +40,14 @@ class _CategoriesListState extends State<CategoriesList> {
               return Text('Загрузка категорий...');
             } 
             else {
-              return Categories(products.data);
+              return Categories(products.data, this);
             }
           }
         ),
         );
         } else {
             return Center(
-              child: Categories(model.categories),
+              child: Categories(model.categories, this),
           );
         }
       }
@@ -56,7 +56,7 @@ class _CategoriesListState extends State<CategoriesList> {
   }
 }
 
-Widget Categories(categories) {
+Widget Categories(categories, main_parent) {
   return GridView.builder(
     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
     crossAxisCount: 2,
@@ -69,15 +69,16 @@ Widget Categories(categories) {
     // ),
     itemCount: categories.length,
     itemBuilder: (BuildContext context, index) {
-      return CategoryCard(category: categories[index]);
+      return CategoryCard(category: categories[index], main_parent: main_parent);
     },
   );
 }
 
 
 class CategoryCard extends StatelessWidget {
-  CategoryCard ({this.category});
+  CategoryCard ({this.category, this.main_parent});
   Map category;
+  dynamic main_parent;
   // String img_url = 'http://127.0.0.1:8000/';
   @override
   Widget build(BuildContext context) {
@@ -90,6 +91,7 @@ class CategoryCard extends StatelessWidget {
           arguments: CategoryArguments(
             category['id'], 
             category['name'],
+            main_parent,
           ),
           );
         },
@@ -138,8 +140,9 @@ class CategoryCard extends StatelessWidget {
 class CategoryArguments {
   final int id;
   final String name;
+  dynamic main_parent;
 
-  CategoryArguments(this.id, this.name);
+  CategoryArguments(this.id, this.name, this.main_parent);
 }
 
 class CategoryPage extends StatefulWidget {
@@ -154,9 +157,12 @@ class _CategoryPageState extends State<CategoryPage> {
   @override
   Widget build(BuildContext context) {
       final CategoryArguments args = ModalRoute.of(context).settings.arguments;
-      print(args.id);
-      print(args.name);
-      return Scaffold(
+      return WillPopScope(
+      onWillPop: () async {
+        args.main_parent.setState(() {});
+        Navigator.of(context).pop();
+      },
+      child: Scaffold(
         appBar: MainAppBar(),
         body: ScopedModelDescendant<AppStateModel>( 
           builder: (context, child, model) { 
@@ -171,16 +177,17 @@ class _CategoryPageState extends State<CategoryPage> {
                   );
                 } else if (products.hasData) {
                   List products = model.get_products_by_category(model.products, args.id);
-                  return Products(args.name, products);
+                  return Products(args.name, products, this);
                 }
               }
             );
           } else {
               List products = model.get_products_by_category(model.products, args.id);
-              return Products(args.name, products);
+              return Products(args.name, products, this);
           }
         }
         ),
+      ),
       );
   }
 }

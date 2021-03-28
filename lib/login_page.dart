@@ -4,6 +4,8 @@ import 'package:scoped_model/scoped_model.dart';
 import 'model/app_state_model.dart';
 import 'useful_widgets.dart';
 
+import 'package:loader_overlay/loader_overlay.dart';
+
 class LoginPage extends StatefulWidget {
   LoginPage({Key key }) : super(key: key);
 
@@ -47,6 +49,9 @@ class LoginPageState extends State<LoginPage> {
                 Container(
                     padding: EdgeInsets.only(top: 20, bottom: 10),
                     child: TextFormField(
+                      obscureText: true,
+                      autocorrect: false,
+                      enableSuggestions: false,
                       controller: passwordController,
                       validator: (value) {
                         if (value.isEmpty) {
@@ -89,12 +94,22 @@ class LoginPageState extends State<LoginPage> {
                         set_password(current_password);
                         bool password_valid = validateform();
                         if (password_valid) {
+                          context.showLoaderOverlay();
                           bool auth_success = await model.auth_user(current_password);
+                          context.hideLoaderOverlay();
                           if (auth_success) {
                             print('auth success. need to log in user');
                             Navigator.pushNamed(context, '/profile');
                           } else {
-                            print('password is not correct');
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return DefaultAlert(context,
+                                 'Ошибка', 
+                                 'Введенный пароль не верный');
+                              }
+                            );
                           }
                         }
                       },
@@ -136,13 +151,6 @@ class LoginPageState extends State<LoginPage> {
   bool validateform() {
     print('start form validating');
     if (_formKey.currentState.validate()) {
-      // print('phone validated');
-      // var phone = _formKey.currentState.;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Проверка пароля для аккаунта ...'),
-        )
-      );
       return true;
     }
     return false;

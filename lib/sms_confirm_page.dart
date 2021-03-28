@@ -87,15 +87,24 @@ class SmsConfirmPageState extends State<SmsConfirmPage> {
                         if (code_not_null) {
                           bool sms_valid = await model.check_sms_code(_sms_code);
                           if (sms_valid) {
-                            print('sms code is valid. Need to finish user register');
+                            // sms code is valid, need to finish register
                             bool user_registered = await model.register_user_finish();
                             if (user_registered) {
                             Navigator.pushNamed(context, '/profile');
                             } else {
-                              print('error while finish user register');
+                              // error while finish user register
                             }
                           } else {
-                            print('sms code is not valid');
+                            // user input code is not valid
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext context) {
+                                  return DefaultAlert(context,
+                                  'Ошибка', 
+                                  'Введенный код не верный');
+                                }
+                              );
                           }
                         }
                       },
@@ -139,11 +148,6 @@ class SmsConfirmPageState extends State<SmsConfirmPage> {
     if (_formKey.currentState.validate()) {
       // print('phone validated');
       // var phone = _formKey.currentState.;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Проверка кода ...'),
-        )
-      );
       return true;
     }
     return false;

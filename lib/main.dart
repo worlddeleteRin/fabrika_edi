@@ -1,22 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_donor/model/app_state_model.dart';
+import 'package:flutter_donor/more_info_delivery.dart';
 import 'package:flutter_donor/profile.dart';
+import 'package:flutter_donor/settings_page.dart';
 import 'package:flutter_donor/sms_confirm_page.dart';
 import 'package:flutter_donor/stock.dart';
+import 'package:flutter_donor/user_addresses.dart';
+import 'package:flutter_donor/user_order_page.dart';
 import 'package:flutter_donor/user_orders.dart';
+
 
 
 import 'package:scoped_model/scoped_model.dart';
 // my imports here
+import 'cart_page.dart';
 import 'categories.dart';
 import 'login_page.dart';
 import 'model/app_state_model.dart';
 import 'more_info.dart';
+import 'more_info_bonus.dart';
+import 'more_info_payment.dart';
+import 'offer_page.dart';
+import 'order_created_page.dart';
 import 'product_page.dart';
 import 'stock_page.dart';
 import 'profile_main_page.dart';
 import 'register_page.dart';
+
+
+import 'package:loader_overlay/loader_overlay.dart';
 
 
 class Destination {
@@ -28,7 +41,7 @@ class Destination {
   final MaterialColor color;
 }
 
-  List<Destination> allDestinations = <Destination>[
+  List<Destination> allDestinations = <Destination> [
   Destination(0, ProfilePage(), 'Профиль', Icons.account_circle, Colors.grey),
   Destination(1, StocksPage(), 'Акции', Icons.star, Colors.cyan),
   Destination(2, CategoriesList(), 'Меню', Icons.local_dining_rounded, Colors.orange),
@@ -74,6 +87,8 @@ class _DestinationViewState extends State<DestinationView> {
             switch(settings.name) {
               case '/':
                 return widget.destination.initial_route;
+              case '/main_page':
+                return CategoriesList();
               case '/category': 
                 return CategoryPage();
               case '/product': 
@@ -88,6 +103,26 @@ class _DestinationViewState extends State<DestinationView> {
                 return SmsConfirmPage();
               case '/profile':
                 return ProfilePage();
+              case '/user_orders':
+                return UserOrdersPage();
+              case '/user_order':
+                return UserOrderPage();
+              case '/cart_page':
+                return CartPage();
+              case '/user_addresses':
+                return UserAddressesPage();
+              case '/settings_page':
+                return SettingsPage();
+              case '/offer_page':
+                return OfferPage();
+              case '/order_created':
+                return OrderCreatedPage();
+              case '/more_info_delivery':
+                return MoreInfoDeliveryPage();
+              case '/more_info_payment':
+                return MoreInfoPaymentPage();
+              case '/more_info_bonus':
+                return MoreInfoBonusPage();
             }
           },
         );
@@ -99,6 +134,7 @@ class _DestinationViewState extends State<DestinationView> {
 class HomePage extends StatefulWidget {
   final AppStateModel model;
   const HomePage({Key key, @required this.model}) : super(key: key);
+
 
   @override
   _HomePageState createState() => _HomePageState(model);
@@ -112,6 +148,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin<HomeP
   List<Key> _destinationKeys;
   int _currentIndex = 2;
 
+  void set_currentIndex(index) async {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -120,9 +162,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin<HomeP
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModel<AppStateModel>(
+    return ScopedModel<AppStateModel>(                     
       model: model,
-    child: NotificationListener<ScrollNotification>(
+      child: ScopedModelDescendant<AppStateModel>(
+      builder: (context, child, model) {
+      int _currentIndex = model.currentIndex;
+      List<Key> _destinationKey =  List<Key>.generate(allDestinations.length, (int index) => GlobalKey()).toList();
+      model.set_destinationKey(_destinationKeys);
+      return NotificationListener<ScrollNotification>(
       child: Scaffold(
         body: SafeArea(
           top: false,
@@ -134,10 +181,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin<HomeP
                   child: DestinationView(
                     destination: destination,
                     onNavigation: () {
+                      print('you are navigate');
                     },
                   ),
                 );
+                print('destination index is ${_currentIndex}');
               if (destination.index == _currentIndex) {
+                // return view;
                 return view;
               } else {
                 return Offstage(child: view);
@@ -155,6 +205,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin<HomeP
               backgroundColor: Colors.grey[800],
               type: BottomNavigationBarType.fixed,
               onTap: (int index) {
+                model.set_currentIndex(index);
                 setState(() {
                   _currentIndex = index;
                 });
@@ -168,6 +219,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin<HomeP
               }).toList(),
             ),
       ),
+    );
+    }
     ),
     );
   }
@@ -176,8 +229,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin<HomeP
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: HomePage(
+    home: LoaderOverlay(
+      useDefaultLoading: true,
+    child: HomePage(
     model: AppStateModel(),
+    ),
   )));
 }
 

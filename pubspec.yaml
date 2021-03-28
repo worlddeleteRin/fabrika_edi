@@ -35,6 +35,8 @@ dependencies:
   badges: ^1.2.0
   mask_text_input_formatter: ^1.2.1
   shared_preferences: ^2.0.4
+  url_launcher: ^6.0.2
+  loader_overlay: ^2.0.0
 
 dev_dependencies:
   flutter_test:

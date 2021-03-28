@@ -14,7 +14,7 @@ import 'product_page.dart';
 import 'useful_widgets.dart';
 
 
-Widget Products(category_name, products) {
+Widget Products(category_name, products, parent) {
       return ListView(
       padding: EdgeInsets.only(top: 15, bottom: 15, left: 10, right: 10,),  
       children: [
@@ -34,12 +34,12 @@ Widget Products(category_name, products) {
           crossAxisCount: 2,
           childAspectRatio: 0.7,
           mainAxisSpacing: 20.0,
-          mainAxisExtent: 270,
+          mainAxisExtent: 280,
           // mainAxisSpacing: 100.0,
           ),
           itemCount: products.length,
           itemBuilder: (BuildContext context, index) {
-            return ProductCard(product: products[index]);
+            return ProductCard(product: products[index], parent: parent);
           },
         ),
   ],);
@@ -51,8 +51,9 @@ Widget Products(category_name, products) {
 
 
 class ProductCard extends StatelessWidget {
-  ProductCard({this.product});
+  ProductCard({this.product, this.parent});
   Map product;
+  dynamic parent;
   @override
   Widget build(BuildContext context) {
       return ScopedModelDescendant<AppStateModel>(
@@ -60,7 +61,8 @@ class ProductCard extends StatelessWidget {
             return GestureDetector(
               onTap: () {
                 Navigator.pushNamed(context, '/product', arguments: ProductPageArguments(
-                  product
+                  product,
+                  parent,
                 ));
               },
             child: Container(
@@ -99,9 +101,11 @@ class ProductCard extends StatelessWidget {
         fit: BoxFit.contain,
       ),
       Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
-          alignment: Alignment.centerLeft,
+          height: 40,
+          alignment: Alignment.topLeft,
             child: AutoSizeText('${product['name']}',
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
@@ -111,17 +115,10 @@ class ProductCard extends StatelessWidget {
               ),
               ),
           ),
-          Container(
-              alignment: Alignment.centerLeft,
-              child: Text('${product['price']}', style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-              )),
-          ),
+          ProductCardPriceBlock(product),
         ],
       ),
-        CartButton(product['id'], 14.0)
+        CartButton(product['id'], parent, 14.0)
         ],),
 
         product['ves'] == 'nan'? Text('') : 
@@ -146,5 +143,40 @@ class ProductCard extends StatelessWidget {
         }
       );
       
+  }
+}
+
+Widget ProductCardPriceBlock(product) {
+  if (product['sale_price'] > 0) {
+    return Container(
+      margin: EdgeInsets.only(top: 4),
+      child: Row(children: [
+        Container(
+          child: Text('${product['price']} ₽', style: TextStyle(
+            decoration: TextDecoration.lineThrough,
+            color: Colors.black54,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ))
+        ),
+        Container(
+          margin: EdgeInsets.only(left: 7),
+          child: Text('${product['sale_price']} ₽', style: TextStyle(
+            color: Colors.redAccent,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ))
+        ),
+      ],)
+    );
+  } else {
+    return Container(
+      alignment: Alignment.centerLeft,
+      child: Text('${product['price']} ₽', style: TextStyle(
+        color: Colors.black,
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+      )),
+  );
   }
 }

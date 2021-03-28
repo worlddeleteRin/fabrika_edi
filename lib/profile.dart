@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'model/app_state_model.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+
 import 'useful_widgets.dart';
 
 import 'profile_main_page.dart';
+
+import 'package:loader_overlay/loader_overlay.dart';
 
 class ProfilePage extends StatefulWidget {
 
@@ -31,7 +34,7 @@ class _ProfilePageState extends State<ProfilePage> {
           if (model.user.isEmpty) {
             return ProfileLogin();
           } else {
-            return ProfileMainPage();
+            return ProfileMainPage(parent: this);
           }
         }
       );
@@ -120,7 +123,10 @@ class ProfileLoginState extends State<ProfileLogin> {
                         set_phone(current_phone);
                         bool phone_valid = validateform();
                         if (phone_valid) {
+                          context.showLoaderOverlay();
                           bool exist = await model.check_account_exist(current_phone);
+                          context.hideLoaderOverlay();
+                          // Navigator.of(context).pop();
                           if (exist) {
                             Navigator.pushNamed(context, '/login_page');
                           } else {

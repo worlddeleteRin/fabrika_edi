@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.flutter_donor">
+   <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="flutter_donor"
+        android:label="Фабрика еды"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

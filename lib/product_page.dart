@@ -12,7 +12,8 @@ import 'useful_widgets.dart';
 
 class ProductPageArguments  {
   Map product;
-  ProductPageArguments(this.product);
+  dynamic main_parent;
+  ProductPageArguments(this.product, this.main_parent);
 }
 
 class ProductPage extends StatefulWidget {
@@ -32,11 +33,17 @@ class _ProductPageState extends State<ProductPage> {
     Map product = args.product;
     return ScopedModelDescendant<AppStateModel>(
       builder: (context, child, model) {
-        return Scaffold(
+        return WillPopScope(
+        onWillPop: ()  {
+          args.main_parent.setState((){});
+          Navigator.of(context).pop();
+        },
+        child: Scaffold(
           appBar: MainAppBar(),
           body: ListView(children: [
                   Container(
-                      padding: EdgeInsets.only(top: 30, left: 15, right: 15),
+                      padding: EdgeInsets.only(top: 30, left: 15, right: 15,),
+                      margin: EdgeInsets.only(bottom: 30),
                     child: Column(children: [
                         Container(
                         child: CachedNetworkImage(
@@ -44,7 +51,8 @@ class _ProductPageState extends State<ProductPage> {
                             placeholder: (context, url) => CircularProgressIndicator.adaptive(),
                             errorWidget: (context, url, error) => Icon(Icons.error),
                             // width: 300,
-                            height: 200,
+                            width: double.infinity,
+                            height: 300,
                             fit: BoxFit.contain,
                           ),
                         ),
@@ -58,7 +66,7 @@ class _ProductPageState extends State<ProductPage> {
                           )),
                         ),
                         Container(
-                          padding: EdgeInsets.only(top: 30, bottom: 20),
+                          padding: EdgeInsets.only(top: 30, bottom: 20, left: 10, right: 10),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -83,7 +91,7 @@ class _ProductPageState extends State<ProductPage> {
                                 fontWeight: FontWeight.w700,
                                 fontSize: 23,
                               )),
-                          CartButton(product['id'], 18.0),
+                          CartButton(product['id'], this, 18.0),
                         ],),
                         ),
                         Container(
@@ -99,6 +107,7 @@ class _ProductPageState extends State<ProductPage> {
                     ],)
                   ),
           ],),
+        ),
         );
       }
     );

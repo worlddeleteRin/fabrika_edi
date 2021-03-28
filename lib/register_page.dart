@@ -4,6 +4,8 @@ import 'package:scoped_model/scoped_model.dart';
 import 'model/app_state_model.dart';
 import 'useful_widgets.dart';
 
+import 'package:loader_overlay/loader_overlay.dart';
+
 class RegisterPage extends StatefulWidget {
   RegisterPage({Key key }) : super(key: key);
 
@@ -84,6 +86,9 @@ class RegisterPageState extends State<RegisterPage> {
                 Container(
                     padding: EdgeInsets.only(top: 20, bottom: 10),
                     child: TextFormField(
+                      obscureText: true,
+                      autocorrect: false,
+                      enableSuggestions: false,
                       controller: passwordController,
                       validator: (value) {
                         if (value.isEmpty) {
@@ -127,42 +132,44 @@ class RegisterPageState extends State<RegisterPage> {
                         set_fields(current_name, current_password);
                         bool form_valid = validateform();
                         if (form_valid) {
+                          context.showLoaderOverlay();
                           bool sms_sent = await model.register_user_request(
                             current_name,
                             current_password
                           );
+                          context.hideLoaderOverlay();
                           if (sms_sent) {
-                            print('sms send on phone, go to sms confirm page');
+                            // sms send on phone, go to sms confirm page
                             Navigator.pushNamed(context, '/sms_confirm_page');
                           } else {
-                            print('sms is not send, print the error');
+                            // sms is not send, print the error
                           }
                         }
                       },
-                      child: Stack(
-                        // mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                        Container(
-                          child: Text('Далее', style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 15,
+                        child: Stack(
+                          // mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                          Container(
+                            child: Text('Далее', style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                            )),
+                            alignment: Alignment.center,
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(right: 10),
+                            alignment: Alignment.centerRight,
+                            child: Icon(Icons.arrow_forward_ios_outlined, size: 16.0),
+                          ),
+                        ],),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(Colors.deepOrange),
+                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
                           )),
-                          alignment: Alignment.center,
+                          padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.only(top: 10, bottom: 10, left: 15, right: 15)),
                         ),
-                        Container(
-                          padding: EdgeInsets.only(right: 10),
-                          alignment: Alignment.centerRight,
-                          child: Icon(Icons.arrow_forward_ios_outlined, size: 16.0),
-                        ),
-                      ],),
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(Colors.deepOrange),
-                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        )),
-                        padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.only(top: 10, bottom: 10, left: 15, right: 15)),
-                      ),
                     ),
                   ),
               ),
@@ -179,11 +186,6 @@ class RegisterPageState extends State<RegisterPage> {
     if (_formKey.currentState.validate()) {
       // print('phone validated');
       // var phone = _formKey.currentState.;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Проверка данных для аккаунта ...'),
-        )
-      );
       return true;
     }
     return false;
