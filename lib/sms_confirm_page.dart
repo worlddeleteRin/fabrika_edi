@@ -90,7 +90,7 @@ class SmsConfirmPageState extends State<SmsConfirmPage> {
                             // sms code is valid, need to finish register
                             bool user_registered = await model.register_user_finish();
                             if (user_registered) {
-                            Navigator.pushNamed(context, '/profile');
+                              Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false );
                             } else {
                               // error while finish user register
                             }
@@ -144,10 +144,7 @@ class SmsConfirmPageState extends State<SmsConfirmPage> {
   );
   }// Widget build
   bool validateform() {
-    print('start form validating');
     if (_formKey.currentState.validate()) {
-      // print('phone validated');
-      // var phone = _formKey.currentState.;
       return true;
     }
     return false;

@@ -74,37 +74,7 @@ Widget MainAppBar() {
             );
           }
         ),
-        // centerTitle: true,
-      // ScopedModelDescendant<AppStateModel>(
-      //       builder: (context, child, model) {
-      //        return Container(
-      //           // width: 0,
-      //           alignment: Alignment.topLeft,
-      //           child: CachedNetworkImage(
-      //             imageUrl: model.main_url + 'static/images/logo2.png',
-      //             placeholder: (context, url) => CircularProgressIndicator.adaptive(),
-      //             errorWidget: (context, url, error) => Icon(Icons.error),
-      //             width: 60,
-      //             height: 60,
-      //             fit: BoxFit.contain,
-      //           ),
-      //       );
-      //     }
-      //   ),
-      // centerTitle: true,
       actions: [
-        // ScopedModelDescendant<AppStateModel>(
-        //   builder: (context, child, model) {
-        //     return CachedNetworkImage(
-        //       imageUrl: model.main_url + 'static/images/slogan.png',
-        //       placeholder: (context, url) => CircularProgressIndicator.adaptive(),
-        //       errorWidget: (context, url, error) => Icon(Icons.error),
-        //       width: 150,
-        //       height: 70,
-        //       fit: BoxFit.contain,
-        //     );
-        //   }
-        // ),
         ScopedModelDescendant<AppStateModel>(
           builder: (context, child, model) {
             return IconButton(

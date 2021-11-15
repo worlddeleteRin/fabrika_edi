@@ -143,6 +143,13 @@ class RegisterPageState extends State<RegisterPage> {
                             Navigator.pushNamed(context, '/sms_confirm_page');
                           } else {
                             // sms is not send, print the error
+                            final snackBar = new SnackBar(
+                            content: new Text('Ошибка при отправке кода'),                                                         
+                            backgroundColor: Colors.red,
+                            duration: Duration(seconds: 2));    
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              snackBar
+                            );
                           }
                         }
                       },
@@ -182,10 +189,7 @@ class RegisterPageState extends State<RegisterPage> {
   );
   }// Widget build
   bool validateform() {
-    print('start form validating');
     if (_formKey.currentState.validate()) {
-      // print('phone validated');
-      // var phone = _formKey.currentState.;
       return true;
     }
     return false;

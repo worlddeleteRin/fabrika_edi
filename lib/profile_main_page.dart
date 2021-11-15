@@ -22,9 +22,9 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
       builder: (context, child, model) {
         return Scaffold(
           appBar: MainAppBar(), 
-          // WillPopScope(
-          // onWillPop: () async => null,
-          body: ScopedModelDescendant<AppStateModel>(
+          body: WillPopScope(
+          onWillPop: () async => null,
+          child: ScopedModelDescendant<AppStateModel>(
             builder: (context, child, model) {
               return RefreshIndicator(
               color: Colors.deepOrange,
@@ -62,20 +62,6 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
                       )),
                     ],),
                   ),
-                  // Container(
-                  //   padding: EdgeInsets.only(top: 8, bottom: 10),
-                  //   child: Row(
-                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //     children: [
-                  //     AutoSizeText('Совершено заказов', style: TextStyle(
-                  //       color: Colors.black54,
-                  //     )),
-                  //     AutoSizeText('3', style: TextStyle(
-                  //       color: Colors.black,
-                  //       fontWeight: FontWeight.w700,
-                  //     ))
-                  //   ],),
-                  // ),
                   GestureDetector(onTap: () {
                     Navigator.pushNamed(context, '/user_orders');
                   },child: NiceLinkItem(context, Icons.shopping_bag, 'Мои заказы'),),
@@ -105,6 +91,7 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
               );  
             }
           // ),
+          ),
           ),
         );
       }

@@ -186,7 +186,6 @@ Widget AdItemCart(context, parent, ad) {
       onTap: () {
         _handleDeliveryRadioValueChange(radio_value);
          Map current_ad = model.get_user_address_by_id(_delivery_radio_value);
-          // print('current_ad is $current_ad');
           setState(() {
             _current_order_address = model.format_address(current_ad);
           });
@@ -389,14 +388,10 @@ Widget CreateOrderButton() {
     margin: EdgeInsets.symmetric(vertical: 10),
     child: ElevatedButton(
     onPressed: () async {
-      print('try to create order');
       int delivery_method = get_delivery_method();
       int payment_method = get_payment_method();
-      print('delivery method is $delivery_method');
-      print('payment method is $payment_method');
       if (model.get_cart_items_length() > 0) { 
       if (model.user.isEmpty) {
-        print('user is not authorized');
         String user_name = notauthNameController.text;
         if (user_name.length < 1) {
           return showDialog(
@@ -420,7 +415,6 @@ Widget CreateOrderButton() {
         String delivery_address = 'Самовывоз';
         if (delivery_method == 1) {
           delivery_address = _current_order_address;
-          print('delivery address is $_current_order_address');
           if (delivery_address.length < 1) {
           return showDialog(
             context: context,
@@ -437,18 +431,15 @@ Widget CreateOrderButton() {
         user_name, 
         user_phone);
         if (order_created) {
-          print('order is created');
           model.delete_all_cart();
           Navigator.pushNamed(context, '/order_created');
         } else {
           // need to return an error dialog
         }
       } else {
-        print('user is authorized');
         int delivery_address_id = 2;
         if (delivery_method == 1) {
           delivery_address_id = _delivery_radio_value;
-          print('delivery address id is $delivery_address_id');
           if (_delivery_radio_value == null) {
             return showDialog(
               context: context,

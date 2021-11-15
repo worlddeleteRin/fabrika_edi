@@ -28,6 +28,9 @@ class _UserAddressesPageState extends State<UserAddressesPage> {
             return FutureBuilder(
               future: model.get_user_addresses(),
               builder: (context, ads) {
+                if (!ads.hasData) {
+                  return Center(child: Text('Загрузка данных...'));
+                }
                 if (ads.hasError) {
                   return Center(
                     child: Text('Возникла ошибка во время загрузки адресов')
@@ -50,7 +53,6 @@ class _UserAddressesPageState extends State<UserAddressesPage> {
 
 
 Widget AdsList(BuildContext context, parent, ads) {
-  print('ads are $ads',);
   List<Widget> ads_widgets = [];
   if (ads.isEmpty) {
     ads_widgets.add(Text('У вас не добавлено ни одного адреса. Добавьте новый, чтобы он здесь отобразился'));
@@ -86,25 +88,6 @@ Widget AdItem(BuildContext context, parent, ad) {
       child: Text('${model.format_address(ad)}'),
       ),
       Row(children: [
-      // Container(
-      // margin: EdgeInsets.symmetric(horizontal: 5),
-      // child: GestureDetector(
-      // onTap: () {
-      //   showDialog(
-      //     context: context,
-      //     builder: (BuildContext context) {
-      //       return EditAdDialog(
-      //         context, 
-      //         parent,
-      //         ad,
-      //         model,
-      //       );
-      //     }
-      //   );
-      // },
-      // child: Icon(Icons.edit, color: Colors.deepOrange),
-      // ),
-      // ),
       Container(
       margin: EdgeInsets.symmetric(horizontal: 5),
       child: GestureDetector(
@@ -159,14 +142,7 @@ Widget DeleteAdDialog(context, parent, ad, model) {
             onPressed: () async {
               await model.delete_user_address(ad['id']);
               await model.get_user_addresses();
-              // call set state just to reload the page
-              print('parent is $parent');
-              // parent._current_order_address = '';
-              parent.setState((){
-                // parent._delivery_radio_value = null;
-              });
-              // parent._handleDeliveryRadioValueChange(null);
-
+              parent.setState((){});
               Navigator.of(context).pop();
             },
           ),
@@ -182,51 +158,6 @@ Widget DeleteAdDialog(context, parent, ad, model) {
       );
 }
 
-// Widget EditAdDialog(context, parent, ad, model) {
-//   return AlertDialog(
-//         title: Text('Редактирование адреса'),
-//         content: SingleChildScrollView(
-//           child: ListBody(
-//             children: <Widget>[
-//               Text(
-//                 'Вы уверены, что хотите удалить данный адрес?',
-//               ),
-//               Container(
-//                 margin: EdgeInsets.only(top: 7),
-//                 child: Text(
-//                 '${model.format_address(ad)}', style: TextStyle(
-//                   fontWeight: FontWeight.w500,
-//                 ),
-//               ),
-//               ),
-//             ],
-//           ),
-//         ),
-//         actions: <Widget>[
-//           TextButton(
-//             child: Text('Да', style: TextStyle(
-//               color: Colors.red,
-//             )),
-//             onPressed: () async {
-//               await model.delete_user_address(ad['id']);
-//               await model.get_user_addresses();
-//               // call set state just to reload the page
-//               parent.setState(() {});
-//               Navigator.of(context).pop();
-//             },
-//           ),
-//           TextButton(
-//             child: Text('Нет', style: TextStyle(
-//               color: Colors.black87,
-//             )),
-//             onPressed: () {
-//               Navigator.of(context).pop();
-//             },
-//           ),
-//         ],
-//       );
-// }
-
 Widget AddAdButton(BuildContext context, parent, model) {
   return Align(
     alignment: Alignment.bottomCenter,
@@ -235,7 +166,6 @@ Widget AddAdButton(BuildContext context, parent, model) {
       height: 40,
     child: ElevatedButton(
       onPressed: () {
-        print('pressed it');
         showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -337,8 +267,6 @@ class _AddAddressDialogState extends State<AddAddressDialog> {
                           labelStyle: TextStyle(
                             color: Colors.black87,
                           ),
-                          // prefixIcon: Icon(Icons.account_circle,
-                          // color: Colors.deepOrange),
                           contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(5.0)),
@@ -426,11 +354,6 @@ class _AddAddressDialogState extends State<AddAddressDialog> {
                     child: TextFormField(
                         controller: ad_flatController,
                         validator: (value) {
-                          // flat can be null
-                          // if (value.isEmpty) {
-                          //   return 'Введите вашу улицу';
-                          // }
-                          // return null;
                         },
                         decoration: InputDecoration(
                           labelText: 'Квартира',
@@ -475,7 +398,6 @@ class _AddAddressDialogState extends State<AddAddressDialog> {
             set_fields(city, street, house, flat, '');
             bool required_not_empty = validateform();
             if (required_not_empty) {
-              print('can create new address');
               await widget.model.create_user_address(city, street, house, flat);
               await widget.model.get_user_addresses();
               this.widget.parent.setState(() {});             
@@ -498,230 +420,10 @@ class _AddAddressDialogState extends State<AddAddressDialog> {
 
 
 bool validateform() {
-    print('start form validating');
     if (_formKey.currentState.validate()) {
-      // print('phone validated');
-      // var phone = _formKey.currentState.;
       return true;
     }
     return false;
 } 
 
 }
-
-// Widget AddAdressDialog(context, parent, model) {
-//   return AlertDialog(
-//     title: Text('Добавление адреса'),
-//     content: SingleChildScrollView(
-//       child: ListBody(
-//         children: <Widget>[
-//           Container(
-//             child: Form(
-//               key: parent._formKey,
-//               child: Column(children: [
-//                 Container(
-//                   margin: EdgeInsets.symmetric(vertical: 5.0),
-//                   child: TextFormField(
-//                       controller: parent.ad_streetController,
-//                       validator: (value) {
-//                         if (value.isEmpty) {
-//                           return 'Введите ваш город';
-//                         }
-//                         return null;
-//                       },
-//                       decoration: InputDecoration(
-//                         labelText: 'Город',
-//                         labelStyle: TextStyle(
-//                           color: Colors.black87,
-//                         ),
-//                         prefixIcon: Icon(Icons.account_circle,
-//                         color: Colors.deepOrange),
-//                         contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
-//                         border: OutlineInputBorder(
-//                           borderRadius: BorderRadius.all(Radius.circular(5.0)),
-//                           borderSide: BorderSide(
-//                             color: Colors.deepOrange,
-//                           ),
-//                         ),
-//                         enabledBorder: const OutlineInputBorder(
-//                           borderSide: const BorderSide(color: Colors.grey, width: 0.0),
-//                         ),
-//                         focusedBorder: const OutlineInputBorder(
-//                           borderSide: const BorderSide(color: Colors.grey, width: 0.0),
-//                         ),
-//                       ),
-//                     ),
-//                 ),
-//                 Container(
-//                   margin: EdgeInsets.symmetric(vertical: 5.0),
-//                   child: TextFormField(
-//                       controller: parent.ad_streetController,
-//                       validator: (value) {
-//                         if (value.isEmpty) {
-//                           return 'Введите вашу улицу';
-//                         }
-//                         return null;
-//                       },
-//                       decoration: InputDecoration(
-//                         labelText: 'Улица',
-//                         labelStyle: TextStyle(
-//                           color: Colors.black87,
-//                         ),
-//                         prefixIcon: Icon(Icons.account_circle,
-//                         color: Colors.deepOrange),
-//                         contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
-//                         border: OutlineInputBorder(
-//                           borderRadius: BorderRadius.all(Radius.circular(5.0)),
-//                           borderSide: BorderSide(
-//                             color: Colors.deepOrange,
-//                           ),
-//                         ),
-//                         enabledBorder: const OutlineInputBorder(
-//                           borderSide: const BorderSide(color: Colors.grey, width: 0.0),
-//                         ),
-//                         focusedBorder: const OutlineInputBorder(
-//                           borderSide: const BorderSide(color: Colors.grey, width: 0.0),
-//                         ),
-//                       ),
-//                     ),
-//                 ),
-//                 Container(
-//                   margin: EdgeInsets.symmetric(vertical: 5.0),
-//                   child: TextFormField(
-//                       controller: parent.ad_streetController,
-//                       validator: (value) {
-//                         if (value.isEmpty) {
-//                           return 'Введите номер дома';
-//                         }
-//                         return null;
-//                       },
-//                       decoration: InputDecoration(
-//                         labelText: 'Дом',
-//                         labelStyle: TextStyle(
-//                           color: Colors.black87,
-//                         ),
-//                         prefixIcon: Icon(Icons.account_circle,
-//                         color: Colors.deepOrange),
-//                         contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
-//                         border: OutlineInputBorder(
-//                           borderRadius: BorderRadius.all(Radius.circular(5.0)),
-//                           borderSide: BorderSide(
-//                             color: Colors.deepOrange,
-//                           ),
-//                         ),
-//                         enabledBorder: const OutlineInputBorder(
-//                           borderSide: const BorderSide(color: Colors.grey, width: 0.0),
-//                         ),
-//                         focusedBorder: const OutlineInputBorder(
-//                           borderSide: const BorderSide(color: Colors.grey, width: 0.0),
-//                         ),
-//                       ),
-//                     ),
-//                 ),
-//                 Container(
-//                   margin: EdgeInsets.symmetric(vertical: 5.0),
-//                   child: TextFormField(
-//                       controller: parent.ad_streetController,
-//                       validator: (value) {
-//                         // flat can be null
-//                         // if (value.isEmpty) {
-//                         //   return 'Введите вашу улицу';
-//                         // }
-//                         // return null;
-//                       },
-//                       decoration: InputDecoration(
-//                         labelText: 'Квартира',
-//                         labelStyle: TextStyle(
-//                           color: Colors.black87,
-//                         ),
-//                         prefixIcon: Icon(Icons.account_circle,
-//                         color: Colors.deepOrange),
-//                         contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
-//                         border: OutlineInputBorder(
-//                           borderRadius: BorderRadius.all(Radius.circular(5.0)),
-//                           borderSide: BorderSide(
-//                             color: Colors.deepOrange,
-//                           ),
-//                         ),
-//                         enabledBorder: const OutlineInputBorder(
-//                           borderSide: const BorderSide(color: Colors.grey, width: 0.0),
-//                         ),
-//                         focusedBorder: const OutlineInputBorder(
-//                           borderSide: const BorderSide(color: Colors.grey, width: 0.0),
-//                         ),
-//                       ),
-//                     ),
-//                 ),
-//               ],),
-//             ),
-//           ),
-//         ],
-//       ),
-//     ),
-//     actions: <Widget>[
-//       TextButton(
-//         child: Text('Сохранить', style: TextStyle(
-//           color: Colors.red,
-//         )),
-//         onPressed: () async {
-//           // call set state just to reload the page
-//           validateform();
-//           parent.setState(() {});
-//           // Navigator.of(context).pop();
-//         },
-//       ),
-//       TextButton(
-//         child: Text('Отмена', style: TextStyle(
-//           color: Colors.black87,
-//         )),
-//         onPressed: () {
-//           Navigator.of(context).pop();
-//         },
-//       ),
-//     ],
-//   );
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-// final _formKey = GlobalKey<FormState>();
-
-
-//   var _ad_city;
-//   var _ad_street;
-//   var _ad_house;
-//   var _ad_flat;
-//   var _ad_comment;
-
-//   final ad_cityController = TextEditingController();
-//   final ad_streetController = TextEditingController();
-//   final ad_houseController = TextEditingController();
-//   final ad_flatController = TextEditingController();
-//   final ad_commentController = TextEditingController();
-
-//   @override 
-//   void dispose() {
-//     ad_cityController.dispose();
-//     ad_streetController.dispose();
-//     ad_houseController.dispose();
-//     ad_flatController.dispose();
-//     ad_commentController.dispose();
-//     super.dispose();
-//   }
-//   void set_fields(ad_street, ad_house, ad_flat, ad_comment) {
-//     setState(() {
-//         _ad_street = ad_street;
-//         _ad_house = ad_house;
-//         _ad_flat = ad_flat;
-//         _ad_comment = ad_comment;
-//       });
-//   }

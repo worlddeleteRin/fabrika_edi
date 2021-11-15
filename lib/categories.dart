@@ -23,35 +23,41 @@ class CategoriesList extends StatefulWidget {
 class _CategoriesListState extends State<CategoriesList> {
   @override 
   Widget build(BuildContext context) {
-
-    return Scaffold(
-        appBar: MainAppBar(),
-        body: ScopedModelDescendant<AppStateModel>(
-      builder: (context, child, model) {
-        if (model.categories.isEmpty) {
-        return Center(
-        child: FutureBuilder(
-          future: model.load_start_info(),
-          builder: (context, products) {
-            if (products.hasError){
-              return Text('Возникла ошибка во время загрузки.');
-            }
-            if (!products.hasData) {
-              return Text('Загрузка категорий...');
-            } 
-            else {
-              return Categories(products.data, this);
-            }
+    return ScopedModelDescendant<AppStateModel>(
+        builder: (context, child, model) {
+          if (model.categories.isEmpty) {
+            return FutureBuilder(
+              future: model.load_start_info(),
+              builder: (context, products) {
+                if (products.hasError){
+                  return Center(
+                  child: Text('Возникла ошибка во время загрузки.'),
+                  );
+                }
+                if (!products.hasData) {
+                  return Center(
+                  child: Text('Загрузка категорий...'),
+                  );
+                } 
+                else {
+                  return Scaffold(
+                    appBar: MainAppBar(),
+                    body: Center(
+                      child: Categories(model.categories, this),
+                    ),
+                  );
+                }
+              }
+            );
+          } else {
+            return Scaffold(
+              appBar: MainAppBar(),
+              body: Center(
+                child: Categories(model.categories, this),
+              ),
+            );
           }
-        ),
-        );
-        } else {
-            return Center(
-              child: Categories(model.categories, this),
-          );
-        }
       }
-    ),
     );
   }
 }
@@ -84,7 +90,6 @@ class CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<AppStateModel>(
       builder: (context, child, model) {
-        // print(model.main_url + category['imgsrc']);
         return GestureDetector(
         onTap: () {
           Navigator.pushNamed(context, "/category",

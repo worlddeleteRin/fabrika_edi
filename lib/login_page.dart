@@ -98,8 +98,7 @@ class LoginPageState extends State<LoginPage> {
                           bool auth_success = await model.auth_user(current_password);
                           context.hideLoaderOverlay();
                           if (auth_success) {
-                            print('auth success. need to log in user');
-                            Navigator.pushNamed(context, '/profile');
+                            Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false );
                           } else {
                             showDialog(
                               context: context,
@@ -149,7 +148,6 @@ class LoginPageState extends State<LoginPage> {
   );
   }// Widget build
   bool validateform() {
-    print('start form validating');
     if (_formKey.currentState.validate()) {
       return true;
     }

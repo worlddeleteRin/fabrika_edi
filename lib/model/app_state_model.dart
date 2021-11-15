@@ -6,11 +6,11 @@ import '../main.dart';
 
 class AppStateModel extends Model {
 
-String ACCESS_TOKEN = 'FJALj242jfL2KL8732VBNLADCP0123';
-String main_url = 'http://127.0.0.1:8000/';
-String url = 'http://127.0.0.1:8000/api/';
-// String main_url = 'https://delivery.fast-code.ru/';
-// String url = 'https://delivery.fast-code.ru/api/';
+String GET_API_ACCESS_TOKEN = 'FJALj242jfL2KL8732VBNLADCP0123';
+String ACCESS_TOKEN;
+String get_api_to_use_url = 'https://fast-code.ru/get_api_fabrika_edi';
+String main_url;
+String url;
 
 // index for page transition
 int _currentIndex = 2;
@@ -35,6 +35,8 @@ String _delivery_phone;
 String get delivery_phone => _delivery_phone;
 String _delivery_address_map;
 String get delivery_address_map => _delivery_address_map;
+String _delivery_main_info;
+String get delivery_main_info => _delivery_main_info;
 
 bool _delivery_byclient_discount_use = false;
 bool get delivery_byclient_discount_use => _delivery_byclient_discount_use;
@@ -82,24 +84,36 @@ Map<int,int> _cartItems = {};
 // starter info method is here
 Future load_start_info() async {
   // get categories on app run
+  // get the api url to use
+  await get_api_to_use();
   await get_critical_info();
   _categories = await getCategories();
   // check if user was logged in 
   bool logged_in = await check_user_login();
   if (logged_in) {
     try {
-    print('user is logged in');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int user_id = prefs.getInt('user_id');
     _user = await get_user_info(user_id);
     _user_orders = await get_user_orders(user_id);
     } catch(error) {
-      print(error);
     }
-    // print('user orders are $_user_orders');
   } 
-  print('loading starter info, categories is ${_categories}');
   return _categories;
+}
+
+Future get_api_to_use() async {
+  String final_url = get_api_to_use_url + '?access_token=' + GET_API_ACCESS_TOKEN;
+  final response = await http.get(final_url);
+  Map<String, dynamic> api_info = jsonDecode(response.body);
+  bool status = api_info['status'];
+  if (status) {
+    main_url = api_info['main_url'];
+    url = api_info['api_url'];
+    ACCESS_TOKEN = api_info['access_token'];
+  } else {
+    
+  }
 }
 
 Future get_critical_info() async {
@@ -108,11 +122,11 @@ Future get_critical_info() async {
     String final_url = request_url + '?access_token=' + ACCESS_TOKEN;
     final response = await http.get(final_url);
     Map<String, dynamic> critical_info = jsonDecode(response.body);
-    print('critical info is $critical_info');
     _delivery_byclient_discount = critical_info['delivery_byclient_discount'];
     _delivery_byclient_address = critical_info['delivery_byclient_address'];
     _delivery_phone = critical_info['delivery_phone'];
     _delivery_address_map = critical_info['delivery_address_map'];
+    _delivery_main_info = critical_info['delivery_main_info'];
     return true;
 }
 
@@ -138,7 +152,6 @@ Future getCategories() async {
     String request_url = url + method;
     String final_url = request_url + '?access_token=' + ACCESS_TOKEN;
     final response = await http.get(final_url).catchError((err) {
-      print(err);
     });
     Map<String, dynamic> categories = jsonDecode(response.body);
     return categories['categories'];
@@ -149,7 +162,6 @@ Future get_stocks() async {
   String request_url = url + method;
   String final_url = request_url + '?access_token=' + ACCESS_TOKEN;
   final response = await http.get(final_url).catchError((err) {
-    print(err);
   });
   Map<String, dynamic> data = jsonDecode(response.body);
   if (data['status'] == 'success') {
@@ -164,11 +176,9 @@ Future check_account_exist(current_phone) async {
   String request_url = url + method;
   String final_url = request_url + '?access_token=' + ACCESS_TOKEN + user_phone;
   final response = await http.get(final_url).catchError((err) {
-    print(err);
   });
   Map<String, dynamic> data = jsonDecode(response.body);
   var user_exist = data['user_exist'];
-  print('response from api: $user_exist');
   _current_user_phone = current_phone;
   return user_exist;
 }
@@ -182,16 +192,12 @@ Future auth_user(password) async {
     String request_url = url + method;
     String final_url = request_url + '?access_token=' + ACCESS_TOKEN + user_phone + user_password;
     final response = await http.get(final_url).catchError((err) {
-      print(err);
     });
     Map<String, dynamic> data = jsonDecode(response.body);
     bool auth_status = data['auth_status'];
     // return user_exist;
-    print('response is $data',);
-    print('auth status is $auth_status');
     if (auth_status) {
        _user = data['user'];
-      print('user is $user');
       await shared_set_user_id(_user['id']);
       _user_orders = await get_user_orders(_user['id']);
     }
@@ -210,16 +216,12 @@ Future register_user_request(name, password) async {
     String request_url = url + method;
     String final_url = request_url + '?access_token=' + ACCESS_TOKEN + user_name + user_phone + user_password;
     final response = await http.get(final_url).catchError((err) {
-      print(err);
     });
     Map<String, dynamic> data = jsonDecode(response.body);
     bool sms_send = data['sms_send'];
     // return user_exist;
-    print('response is $data',);
-    print('sms send status is $sms_send');
     if (sms_send) {
        _sms_code = data['sms_code'];
-      print('sms code is $_sms_code');
     }
     return sms_send;
 }
@@ -237,16 +239,12 @@ Future register_user_finish() async {
     String request_url = url + method;
     String final_url = request_url + '?access_token=' + ACCESS_TOKEN + user_name + user_phone + user_password;
     final response = await http.get(final_url).catchError((err) {
-      print(err);
     });
     Map<String, dynamic> data = jsonDecode(response.body);
     bool user_registered = data['user_registered'];
     // return user_exist;
-    print('response is $data',);
-    print('user registered status is $user_registered');
     if (user_registered) {
        _user = data['user'];
-      print('user is $_user');
       await shared_set_user_id(_user['id']);
       _user_orders = await get_user_orders(_user['id']);
     }
@@ -255,8 +253,6 @@ Future register_user_finish() async {
 
 bool check_sms_code(sms_code) {
   sms_code = int.parse(sms_code);
-  print('input sms code is $sms_code');
-  print('sms code need to be $_sms_code');
   if (_sms_code == sms_code) {
     return true;
   } else {
@@ -272,7 +268,6 @@ List get_products_by_category(products, category_id) {
 Future check_user_login() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   int user_id = prefs.getInt('user_id');
-  print('prefs user_id is ${user_id}');
   if (user_id == null) {
     return false;
   } else {
@@ -297,7 +292,6 @@ Future get_user_info(int user_id) async {
     String user = '&user_id=' + user_id.toString();
     String final_url = request_url + '?access_token=' + ACCESS_TOKEN + user;
     final response = await http.get(final_url).catchError((err) {
-      print(err);
     }); 
     Map<String, dynamic> data = jsonDecode(response.body);
     _user = data['user'];
@@ -310,7 +304,6 @@ Future get_user_orders(user_id) async {
     String user = '&user_id=' + user_id.toString();
     String final_url = request_url + '?access_token=' + ACCESS_TOKEN + user;
     final response = await http.get(final_url).catchError((err) {
-      print(err);
     }); 
     Map<String, dynamic> data = jsonDecode(response.body);
     _user_orders = data['orders'];
@@ -323,7 +316,6 @@ Future get_user_addresses() async {
     String user = '&user_id=' + user_id.toString();
     String final_url = request_url + '?access_token=' + ACCESS_TOKEN + user;
     final response = await http.get(final_url).catchError((err) {
-      print(err);
     }); 
     Map<String, dynamic> data = jsonDecode(response.body);
     _user_ad = data['addresses'];
@@ -337,7 +329,6 @@ Future delete_user_address(ad_id) async {
     String address_id = '&address_id=' + ad_id.toString();
     String final_url = request_url + '?access_token=' + ACCESS_TOKEN + user + address_id;
     final response = await http.get(final_url).catchError((err) {
-      print(err);
     }); 
     Map<String, dynamic> data = jsonDecode(response.body);
 }
@@ -352,7 +343,6 @@ Future create_user_address(city, street, house, flat) async {
     String ad_flat = '&flat=' + flat.toString();
     String final_url = request_url + '?access_token=' + ACCESS_TOKEN + user + ad_city + ad_street + ad_house + ad_flat;
     final response = await http.get(final_url).catchError((err) {
-      print(err);
     }); 
     Map<String, dynamic> data = jsonDecode(response.body);
 }
@@ -365,7 +355,6 @@ Future change_user_password(password) async {
     String new_password = "&password=" + password.toString();
     String final_url = request_url + '?access_token=' + ACCESS_TOKEN + user + new_password;
     final response = await http.get(final_url).catchError((err) {
-      print(err);
     }); 
     Map<String, dynamic> data = jsonDecode(response.body);
     bool password_changed = data['password_changed'];
@@ -401,7 +390,6 @@ Future create_order_not_auth(
     },
     body: jsonEncode(mydata),
   ).catchError((err) {
-    print(err);
   });
     Map<String, dynamic> data = jsonDecode(response.body);
     bool order_created = data['order_created'];
@@ -434,7 +422,6 @@ Future create_order_auth(
     },
     body: jsonEncode(mydata),
   ).catchError((err) {
-    print(err);
   });
     Map<String, dynamic> data = jsonDecode(response.body);
     bool order_created = data['order_created'];
@@ -447,7 +434,6 @@ Future verify_get_promo(String input_promo_code) async {
     String promo_code = '&promo_code=' + input_promo_code.toString();
     String final_url = request_url + '?access_token=' + ACCESS_TOKEN + promo_code;
     final response = await http.get(final_url).catchError((err) {
-      print(err);
     }); 
     Map<String, dynamic> data = jsonDecode(response.body);
     bool promo_status = data['promo_status'];
@@ -465,7 +451,6 @@ String check_promo_cart() {
   String promo_msg = '';
   List promo_products_ids = get_promo_products_ids();
   List promo_categories_ids = get_promo_categories_ids();
-  print('Промокод подходит товарам с айдишниками $promo_categories_ids');
   if (_current_promo['from_amount'] > get_cart_amount()) {
     promo_msg = "Данный промокод действует при заказе от ${_current_promo['from_amount']} руб.";
     return promo_msg;
@@ -507,7 +492,6 @@ String check_promo_cart() {
   return '';
 }
 void apply_promo() {
-  print('start promo apply');
   _promo_in_use = new Map.from(_current_promo);
 }
 void delete_promo() {
@@ -518,7 +502,6 @@ void delete_promo() {
 List get_promo_products_ids() {
   List promo_products_ids = [];
   if (_current_promo['promo_products'].isEmpty) {
-    print('it is empty');
     return [];
   } 
   for (Map product in _current_promo['promo_products']) {
@@ -529,7 +512,6 @@ List get_promo_products_ids() {
 List get_promo_categories_ids() {
   List promo_categories_ids = [];
   if (_current_promo['promo_categories'].isEmpty) {
-    print('it is empty');
     return [];
   } 
   for (Map category in _current_promo['promo_categories']) {
@@ -547,22 +529,18 @@ List get_cart_items_categories_ids() {
       categories_ids.add(product['category_id']);
     }
   }
-  print('Категории товаров в коризине с айдишниками $categories_ids');
   return categories_ids;
 }
 List<int> get_cart_items_ids() {
-  print('attention');
   return _cartItems.keys.toList();
 }
 
 void add_cart_item(int product_id) {   
-  print('start add products to cart');
   if (_cartItems.keys.contains(product_id)) {
     _cartItems[product_id] += 1;
   } else {
     _cartItems[product_id] = 1;
   }
-  print(_cartItems);
 }
 
 void add_cart_item_quantity(int product_id) {

@@ -51,6 +51,8 @@ class ChangePasswordForm extends StatefulWidget {
 class _ChangePasswordFormState extends State<ChangePasswordForm> {
   final _formKey = GlobalKey<FormState>();
 
+  // String reg_password = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]";
+
   var _password1;
   var _password2;
 
@@ -108,6 +110,9 @@ class _ChangePasswordFormState extends State<ChangePasswordForm> {
                           else if (value != password2) {
                             return 'Пароли не совпадают';
                           }
+                          // else if(!RegExp(reg_password).hasMatch(value)) {
+                          //   return 'Пароль введен не корректно';
+                          // }
                           return null;
                         },
                         decoration: InputDecoration(
@@ -220,5 +225,6 @@ bool validateform() {
     }
     return false;
   } 
+
 
 }

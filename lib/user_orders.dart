@@ -71,7 +71,6 @@ Widget UserOrders(BuildContext context, orders) {
 Widget UserOrder(BuildContext context, order) {
   return GestureDetector(
   onTap: () {
-    print('order is $order');
     Navigator.pushNamed(context, '/user_order', arguments: UserOrderPageArguments(order));
   },
   child: Container(
@@ -161,31 +160,16 @@ Widget UserOrdersEmpty(context) {
         padding: EdgeInsets.only(top: 15,),
         child: GestureDetector(
           onTap: () {
-            print('tapped on it');
             // return Navigator.pushNamed(context, '/main_page');
           },
           child: ElevatedButton(
                       onPressed: () async {
-                        // print('clicked it');
                         model.set_currentIndex(2);
-                        return main();
-                        // print('current index is ${model.currentIndex}',);
-                        // final Widget view = KeyedSubtree(
-                        //   key: model.destinationKey[2],
-                        //   child: DestinationView(
-                        //     destination: allDestinations[2],
-                        //     onNavigation: () {
-                        //     },
-                        //   ),
-                        // );
-                        // print('view to render is $view',);
-                        // return Builder(builder: context);
-                        // Navigator.pop(context);
-                        // return view;
-                        
+                        // Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false );
+                        AppBuilder.of(context).rebuild();
+                        // return main_app();
                       },
                       child: Stack(
-                        // mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                         Container(
                           child: Text('В каталог', style: TextStyle(
@@ -232,10 +216,11 @@ Widget UserOrdersNeedLogin() {
         ElevatedButton(
           onPressed: () async {
             model.set_currentIndex(0);
-            return main();
+            AppBuilder.of(context).rebuild();
+            // Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false );
+            // return main_app();
           },
           child: Stack(
-            // mainAxisAlignment: MainAxisAlignment.center,
             children: [
             Container(
               child: Text('Войти в аккаунт', style: TextStyle(

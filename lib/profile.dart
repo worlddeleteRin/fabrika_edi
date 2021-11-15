@@ -170,15 +170,7 @@ class ProfileLoginState extends State<ProfileLogin> {
   );
   }// Widget build
   bool validateform() {
-    print('start form validating');
     if (_formKey.currentState.validate()) {
-      // print('phone validated');
-      // var phone = _formKey.currentState.;
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(
-      //     content: Text('Проверка аккаунта $_phone ...'),
-      //   )
-      // );
       return true;
     }
     return false;

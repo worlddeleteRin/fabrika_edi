@@ -28,7 +28,6 @@ class _CartPageState extends State<CartPage> {
       });
   }
   bool validateform() {
-    print('start form validating');
     if (_formKey.currentState.validate()) {
       return true;
     }
@@ -321,7 +320,6 @@ Widget PromoWidget(parent) {
                   );
                 }
                 String input_promo = parent.promoController.text;
-                print('input promo is $input_promo');
                 bool promo_status = await model.verify_get_promo(input_promo);
                 if (!promo_status) {
                   return showDialog(
@@ -333,8 +331,6 @@ Widget PromoWidget(parent) {
                     }
                   );
                 } else {
-                  print('promo is valid, need to apply it');
-                  print('current promo is ${model.current_promo}');
                   String promo_check_status = model.check_promo_cart();
                   parent.set_promo_status(promo_check_status);
                 }
@@ -376,7 +372,6 @@ Widget PromoUsedWidget(parent) {
           margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
           child: ElevatedButton(
             onPressed: () {
-              print('pressed on the button');
               model.delete_promo();
               parent.setState(() {});
             },
@@ -427,7 +422,8 @@ Widget EmptyCartWidget(context, model) {
           onPressed: () async {
             model.set_currentIndex(2);
             Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false );
-            return main();
+            AppBuilder.of(context).rebuild();
+            // return main_app();
           },
           child: Stack(
               // mainAxisAlignment: MainAxisAlignment.center,

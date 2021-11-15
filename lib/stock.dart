@@ -50,6 +50,15 @@ Widget Stocks(stocks, context) {
   for (Map stock in stocks) {
     stocks_widgets.add(Stock(context, stock));
   }
+  Widget stock_info = Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+    Container(margin: EdgeInsets.only(top: 7)),
+    NiceTitleBold('*Скидки по акциям не суммируются.', 15.0),
+    NiceTitleBold('*За один заказ клиент может воспользоваться только одной акцией', 15.0),
+    Container(margin: EdgeInsets.only(bottom: 10)),
+  ],);
+  stocks_widgets.add(stock_info);
   return Container(
   padding: EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 10),
   child: ListView(

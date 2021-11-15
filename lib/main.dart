@@ -181,11 +181,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin<HomeP
                   child: DestinationView(
                     destination: destination,
                     onNavigation: () {
-                      print('you are navigate');
                     },
                   ),
                 );
-                print('destination index is ${_currentIndex}');
               if (destination.index == _currentIndex) {
                 // return view;
                 return view;
@@ -226,17 +224,73 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin<HomeP
   }
 }
 
-void main() {
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: LoaderOverlay(
-      useDefaultLoading: true,
-    child: HomePage(
-    model: AppStateModel(),
-    ),
-  )));
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: Future.delayed(Duration(seconds: 2)),
+      builder: (context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return MaterialApp(
+            home: Splash(),
+          );
+        } else {
+            return AppBuilder(
+            builder: (BuildContext context) {
+            return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: LoaderOverlay(
+              useDefaultLoading: true,
+            child: HomePage(
+            model: AppStateModel(),
+            ),
+            ),
+          );
+            }
+          );
+        }
+      }
+    );
+  }
 }
 
+class Splash extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Image(
+          image: AssetImage('assets/launch/launch_screen_main.png'),
+        ),
+        // child: Icon(
+        //   Icons.apartment_outlined,
+        //   size: MediaQuery.of(context).size.width * 0.785,
+        // ),
+      ),
+    );
+  }
+}
+
+void main() {
+  runApp(MyApp());
+}
+
+Widget main_app() {
+  return AppBuilder(
+            builder: (BuildContext context) {
+            return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: LoaderOverlay(
+              useDefaultLoading: true,
+            child: HomePage(
+            model: AppStateModel(),
+            ),
+            ),
+          );
+            }
+          );
+}
 
 Widget TestWidget() {
   return Center(
@@ -244,6 +298,33 @@ Widget TestWidget() {
   );
 }
 
+
+class AppBuilder extends StatefulWidget {
+  final Function(BuildContext) builder;
+
+  const AppBuilder(
+      {Key key, this.builder})
+      : super(key: key);
+
+  @override
+  AppBuilderState createState() => new AppBuilderState();
+
+  static AppBuilderState of(BuildContext context) {
+    return context.findAncestorStateOfType<AppBuilderState>();
+  }
+}
+
+class AppBuilderState extends State<AppBuilder> {
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.builder(context);
+  }
+
+  void rebuild() {
+    setState(() {});
+  }
+}
 
 
 

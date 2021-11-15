@@ -42,7 +42,8 @@ class _OrderCreatedPageState extends State<OrderCreatedPage> {
                   onPressed: () async {
                     model.set_currentIndex(2);
                     Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false );
-                    return main();
+                    AppBuilder.of(context).rebuild();
+                    // return main_app();
                   },
                   child: Stack(
                     // mainAxisAlignment: MainAxisAlignment.center,
@@ -79,7 +80,8 @@ class _OrderCreatedPageState extends State<OrderCreatedPage> {
                   onPressed: () async {
                     model.set_currentIndex(3);
                     Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false );
-                    return main();
+                    AppBuilder.of(context).rebuild();
+                    // return main_app();
                   },
                   child: Stack(
                     // mainAxisAlignment: MainAxisAlignment.center,

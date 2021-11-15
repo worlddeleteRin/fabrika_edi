@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'model/app_state_model.dart';
@@ -47,36 +48,9 @@ Widget MoreInfoDeliveryWidget(context, model) {
       children: [
       NiceTitleBold('Детали стоимости доставки', 17.0),
       Container(margin: EdgeInsets.only(top: 7),),
-      Container(child: Text(
-        '✓ Алупка - доставка бесплатнаяя. Минимальная сумма заказа - 850 ₽',
-        style: TextStyle(
-          fontSize: 15,
-        ),
-      )),
-      Container(child: Text(
-        '✓ Кореиз, Гаспра, Симеиз - 100₽. При заказе от 1200₽ доставка бесплатная.',
-        style: TextStyle(
-          fontSize: 15,
-        ),
-      )),
-      Container(child: Text(
-        '✓ Голубой залив, Кацивели, Понизовка, Мрия, Оползневое, Курпаты, Ореанда - 150₽. При заказе от 1500₽ доставка бесплатная.',
-        style: TextStyle(
-          fontSize: 15,
-        ),
-      )),
-      Container(child: Text(
-        '✓ Ливадия, Береговое, Кастрополь, Олива, Парковое - 200₽. При заказе от 2000₽ доставка бесплатная.',
-        style: TextStyle(
-          fontSize: 15,
-        ),
-      )),
-      Container(child: Text(
-         '✓ Ялта, Форос, Санаторное - 250₽. При заказе от 2500 доставка бесплатная.',
-          style: TextStyle(
-          fontSize: 15,
-        ),
-      )),
+      AutoSizeText(
+        "${model.delivery_main_info}"
+      ),
       Container(margin: EdgeInsets.only(top: 7),),
       NiceTitleBold('Самовывоз', 17.0),
       Container(child: Text(
